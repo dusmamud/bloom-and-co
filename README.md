@@ -38,4 +38,4 @@ npm run preview  # serve build/ locally
 ## Deploy
 
 GitHub Actions (`.github/workflows/deploy.yml`): push to `main` → build → Cloudflare Pages.
-Live: https://bloom-and-co.pages.dev
+Live: https://bloom-and-co-bfk.pages.dev

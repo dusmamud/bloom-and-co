@@ -3,7 +3,7 @@
 export const site = {
 	name: 'Bloom & Co.',
 	tagline: 'Flowers for a Brighter Tomorrow',
-	url: 'https://bloom-and-co.pages.dev',
+	url: 'https://bloom-and-co-bfk.pages.dev',
 	phoneDisplay: '+91 98765 43210',
 	phoneHref: 'tel:+919876543210',
 	email: 'hello@bloomandco.in',
