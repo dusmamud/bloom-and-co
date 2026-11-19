@@ -1,13 +1,8 @@
 <script lang="ts">
 	import { Clock, MapPin, PackageCheck, Truck } from '@lucide/svelte';
 	import PageHero from '#lib/components/PageHero.svelte';
+	import { deliveryZones, money } from '#lib/data/site.ts';
 
-	const zones = [
-		{ area: 'Bandra West', time: 'Same-day', fee: '₹199 · free over ₹999' },
-		{ area: 'Mumbai (Andheri, Juhu, Khar, Santacruz)', time: 'Same-day', fee: '₹199 · free over ₹999' },
-		{ area: 'Outer Mumbai (Powai, Thane, Borivali)', time: 'Next-day', fee: '₹299' },
-		{ area: 'Outside Mumbai', time: 'Via partner florist', fee: 'From ₹399' }
-	];
 	const steps = [
 		{ icon: Clock, title: 'Order by 2pm', text: 'Same-day delivery, seven days a week. After 2pm, your bouquet goes out first thing tomorrow.' },
 		{ icon: Truck, title: 'Our own couriers', text: 'Flowers travel upright in water, never flat in a van. No gig drivers, no crushed petals.' },
@@ -34,23 +29,32 @@
 	</div>
 
 	<h2 class="mt-14 font-display text-3xl font-bold text-leaf">Delivery zones &amp; fees</h2>
+	<p class="mt-2 text-muted">Same fees as the PIN checker on the home page — no surprises at checkout. Free delivery on all orders over ₹999.</p>
 	<div class="mt-6 overflow-x-auto rounded-3xl ring-1 ring-line">
 		<table class="w-full min-w-[560px] bg-white text-left">
 			<thead>
 				<tr class="bg-blush text-sm font-bold text-ink">
 					<th class="px-5 py-4">Area</th>
-					<th class="px-5 py-4">Speed</th>
+					<th class="px-5 py-4">Same-day cutoff</th>
 					<th class="px-5 py-4">Fee</th>
+					<th class="px-5 py-4">Note</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-line">
-				{#each zones as z}
+				{#each deliveryZones as z}
 					<tr>
 						<td class="px-5 py-4 font-semibold text-ink">{z.area}</td>
-						<td class="px-5 py-4 text-muted">{z.time}</td>
-						<td class="px-5 py-4 text-muted">{z.fee}</td>
+						<td class="px-5 py-4 text-muted">{z.cutoff}</td>
+						<td class="px-5 py-4 text-muted">{z.fee === 0 ? 'Free' : money(z.fee)}</td>
+						<td class="px-5 py-4 text-muted">{z.note}</td>
 					</tr>
 				{/each}
+				<tr>
+					<td class="px-5 py-4 font-semibold text-ink">Outside Mumbai</td>
+					<td class="px-5 py-4 text-muted">—</td>
+					<td class="px-5 py-4 text-muted">From ₹399</td>
+					<td class="px-5 py-4 text-muted">Via a trusted partner florist</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>

@@ -22,7 +22,7 @@ for (const file of files) {
 	const input = join(SRC.pathname, file);
 	for (const width of WIDTHS) {
 		const base = sharp(input).resize(width, null, { withoutEnlargement: true });
-		await base.clone().avif({ quality: 50 }).toFile(join(OUT.pathname, `${name}-${width}.avif`));
+		await base.clone().avif({ quality: 50, effort: 2 }).toFile(join(OUT.pathname, `${name}-${width}.avif`));
 		await base.clone().webp({ quality: 80 }).toFile(join(OUT.pathname, `${name}-${width}.webp`));
 		await base
 			.clone()

@@ -8,10 +8,13 @@
 	let query = $state('');
 	let occasion = $state('all');
 	let sort = $state('featured');
+	let category = $state('all');
+	let priceBand = $state('all');
 
 	// searchParams is unavailable during prerender — read it client-side only.
 	$effect(() => {
 		occasion = page.url.searchParams.get('occasion') ?? 'all';
+		category = page.url.searchParams.get('category') ?? 'all';
 	});
 
 	const flowerTypes = $derived([...new Set(products.flatMap((p) => p.flowers))].sort());
@@ -21,6 +24,10 @@
 		let list = products.filter((p) => {
 			if (occasion !== 'all' && !p.occasions.includes(occasion)) return false;
 			if (flower !== 'all' && !p.flowers.includes(flower)) return false;
+			if (category !== 'all' && p.category !== category) return false;
+			if (priceBand === 'under-999' && p.price >= 999) return false;
+			if (priceBand === '999-1999' && (p.price < 999 || p.price > 1999)) return false;
+			if (priceBand === '2000-plus' && p.price < 2000) return false;
 			if (query.trim()) {
 				const q = query.trim().toLowerCase();
 				if (!`${p.name} ${p.blurb} ${p.flowers.join(' ')}`.toLowerCase().includes(q)) return false;
@@ -121,10 +128,42 @@
 		{/each}
 	</div>
 
+	<!-- Category + price chips -->
+	<div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter by type and price">
+		{#each [['all', 'Everything'], ['bouquet', 'Bouquets'], ['plant', 'Plants'], ['hamper', 'Hampers & Combos']] as [value, label]}
+			<button
+				type="button"
+				onclick={() => (category = value)}
+				aria-pressed={category === value}
+				class="min-h-11 rounded-full border border-line px-5 text-sm font-bold transition-colors duration-200 {category ===
+				value
+					? 'border-leaf bg-leaf text-white'
+					: 'bg-white text-ink hover:border-leaf'}"
+			>
+				{label}
+			</button>
+		{/each}
+		<span class="mx-1 hidden h-11 w-px bg-line sm:block" aria-hidden="true"></span>
+		{#each [['all', 'Any price'], ['under-999', 'Under ₹999'], ['999-1999', '₹999 – ₹1,999'], ['2000-plus', '₹2,000+']] as [value, label]}
+			<button
+				type="button"
+				onclick={() => (priceBand = value)}
+				aria-pressed={priceBand === value}
+				class="min-h-11 rounded-full border border-line px-5 text-sm font-bold transition-colors duration-200 {priceBand ===
+				value
+					? 'border-leaf bg-leaf text-white'
+					: 'bg-white text-ink hover:border-leaf'}"
+			>
+				{label}
+			</button>
+		{/each}
+	</div>
+
 	<p class="mt-8 text-sm font-semibold text-muted" aria-live="polite">
 		{filtered.length} bouquet{filtered.length === 1 ? '' : 's'}
 		{occasion !== 'all' ? ` for ${occasions.find((o) => o.id === occasion)?.name ?? ''}` : ''}
 		{flower !== 'all' ? ` · ${flower}` : ''}
+		{category !== 'all' ? ` · ${category === 'bouquet' ? 'Bouquets' : category === 'plant' ? 'Plants' : 'Hampers'}` : ''}
 	</p>
 
 	{#if filtered.length === 0}
@@ -139,6 +178,8 @@
 					query = '';
 					occasion = 'all';
 					flower = 'all';
+					category = 'all';
+					priceBand = 'all';
 				}}
 				class="mt-6 inline-flex min-h-12 items-center rounded-full bg-rose px-7 text-sm font-bold text-white"
 			>

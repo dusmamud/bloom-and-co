@@ -8,11 +8,31 @@
 	let name = $state('');
 	let phone = $state('');
 	let address = $state('');
+	let pin = $state('');
 	let date = $state('');
 	let slot = $state('Morning (9am–12pm)');
 	let message = $state('');
-	let payment = $state('card');
+	let payment = $state('upi');
 	let orderRef = $state('');
+	let minDate = $state('');
+
+	// Date picker bounds are client-side (prerender must not bake build-time dates).
+	$effect(() => {
+		const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+		if (ist.getHours() >= 14) ist.setDate(ist.getDate() + 1);
+		minDate = `${ist.getFullYear()}-${String(ist.getMonth() + 1).padStart(2, '0')}-${String(ist.getDate()).padStart(2, '0')}`;
+		if (!date) date = minDate;
+	});
+
+	function toStep2() {
+		// Carry the card message typed on the product page into checkout.
+		if (!message.trim()) {
+			const withMessage = cart.lines.find((l) => l.cardMessage.trim());
+			if (withMessage) message = withMessage.cardMessage;
+		}
+		if (!date && cart.lines[0]?.deliveryDate) date = cart.lines[0].deliveryDate;
+		step = 2;
+	}
 
 	function placeOrder() {
 		orderRef = `BLM-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
@@ -42,12 +62,20 @@
 				bouquet and deliver it on <strong class="text-white">{date || 'your chosen date'}</strong>, {slot.toLowerCase()}.
 			</p>
 			<p class="mt-2 text-sm text-white/70">A confirmation text is on its way to {phone || 'your phone'}.</p>
-			<a
-				href="/shop"
-				class="mt-7 inline-flex min-h-12 items-center rounded-full bg-white px-8 text-base font-bold text-leaf"
-			>
-				Shop more flowers
-			</a>
+			<div class="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+				<a
+					href="/track-order"
+					class="inline-flex min-h-12 items-center rounded-full bg-white px-8 text-base font-bold text-leaf"
+				>
+					Track your order →
+				</a>
+				<a
+					href="/shop"
+					class="inline-flex min-h-12 items-center rounded-full border border-white/40 px-8 text-base font-bold text-white"
+				>
+					Shop more flowers
+				</a>
+			</div>
 		</div>
 	{:else if cart.count === 0}
 		<div class="rounded-[2rem] bg-blush px-6 py-14 text-center">
@@ -85,17 +113,26 @@
 			<div class="mt-8 rounded-[2rem] bg-white p-6 ring-1 ring-line sm:p-8">
 				<h2 class="font-display text-2xl font-bold text-leaf">Your bouquets</h2>
 				<ul class="mt-4 divide-y divide-line">
-					{#each cart.lines as line (line.name)}
+					{#each cart.lines as line (line.key)}
 						<li class="flex items-center justify-between gap-4 py-4">
 							<div class="min-w-0">
 								<p class="font-bold text-ink">{line.name}</p>
-								<p class="text-sm text-muted">{money(line.price)} each</p>
+								<p class="text-sm text-muted">{line.tier} · {money(line.price)} each</p>
+								{#if line.addons.length > 0}
+									<p class="text-xs text-muted">+ {line.addons.join(', ')}</p>
+								{/if}
+								{#if line.deliveryDate}
+									<p class="text-xs font-semibold text-leaf">Deliver on {line.deliveryDate}</p>
+								{/if}
+								{#if line.cardMessage}
+									<p class="truncate text-xs text-muted italic">Card: “{line.cardMessage}”</p>
+								{/if}
 							</div>
 							<div class="flex shrink-0 items-center gap-3">
 								<div class="flex items-center rounded-full bg-blush">
-									<button type="button" onclick={() => setQty(line.name, line.qty - 1)} aria-label={`One less ${line.name}`} class="flex h-11 w-11 items-center justify-center rounded-full">−</button>
+									<button type="button" onclick={() => setQty(line.key, line.qty - 1)} aria-label={`One less ${line.name}`} class="flex h-11 w-11 items-center justify-center rounded-full">−</button>
 									<span class="w-6 text-center text-sm font-bold">{line.qty}</span>
-									<button type="button" onclick={() => setQty(line.name, line.qty + 1)} aria-label={`One more ${line.name}`} class="flex h-11 w-11 items-center justify-center rounded-full">+</button>
+									<button type="button" onclick={() => setQty(line.key, line.qty + 1)} aria-label={`One more ${line.name}`} class="flex h-11 w-11 items-center justify-center rounded-full">+</button>
 								</div>
 								<p class="w-20 text-right font-black text-ink">{money(line.price * line.qty)}</p>
 							</div>
@@ -109,7 +146,7 @@
 				</div>
 				<button
 					type="button"
-					onclick={() => (step = 2)}
+					onclick={toStep2}
 					class="mt-6 flex min-h-12 w-full items-center justify-center rounded-full bg-rose text-base font-bold text-white transition-colors duration-200 hover:bg-rose-dark"
 				>
 					Continue to delivery →
@@ -127,7 +164,7 @@
 				<div class="mt-5 grid gap-4 sm:grid-cols-2">
 					<label class="block text-sm font-bold text-ink">
 						Recipient name
-						<input required bind:value={name} placeholder="e.g. Sarah Mitchell" class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal outline-none focus:border-rose" />
+						<input required bind:value={name} placeholder="e.g. Priya Sharma" class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal outline-none focus:border-rose" />
 					</label>
 					<label class="block text-sm font-bold text-ink">
 						Recipient phone
@@ -138,8 +175,12 @@
 						<input required bind:value={address} placeholder="Street, apartment, city" class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal outline-none focus:border-rose" />
 					</label>
 					<label class="block text-sm font-bold text-ink">
+						PIN code
+						<input required type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" bind:value={pin} placeholder="400 050" class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal tracking-widest outline-none focus:border-rose" />
+					</label>
+					<label class="block text-sm font-bold text-ink">
 						Delivery date
-						<input required type="date" bind:value={date} class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal outline-none focus:border-rose" />
+						<input required type="date" min={minDate} bind:value={date} class="mt-1.5 min-h-12 w-full rounded-2xl border border-line px-4 text-base font-normal outline-none focus:border-rose" />
 					</label>
 					<label class="block text-sm font-bold text-ink">
 						Time slot
@@ -157,8 +198,8 @@
 
 				<fieldset class="mt-7">
 					<legend class="text-sm font-bold text-ink">Payment method (mock — no payment is taken)</legend>
-					<div class="mt-3 grid gap-3 sm:grid-cols-3">
-						{#each [['card', 'Card'], ['paypal', 'PayPal'], ['cod', 'Pay on delivery']] as [value, label]}
+					<div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+						{#each [['upi', 'UPI'], ['card', 'Card'], ['wallet', 'Wallet'], ['cod', 'Pay on delivery']] as [value, label]}
 							<label class="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-sm font-bold transition-colors duration-200 {payment === value ? 'border-rose bg-rose-soft text-rose-dark' : 'border-line text-ink'}">
 								<input type="radio" name="payment" {value} bind:group={payment} class="sr-only" />
 								{label}
@@ -166,6 +207,18 @@
 						{/each}
 					</div>
 				</fieldset>
+
+				<!-- Order recap before Pay: date + slot + card message -->
+				<div class="mt-7 rounded-2xl bg-blush px-5 py-4 text-sm leading-relaxed">
+					<p class="font-bold text-ink">Please check before you pay</p>
+					<p class="mt-1 text-muted">
+						Delivery on <strong class="text-ink">{date || 'your chosen date'}</strong>, {slot.toLowerCase()} · to {name || 'the recipient'}{pin ? `, PIN ${pin}` : ''}
+					</p>
+					{#if message.trim()}
+						<p class="mt-1 text-muted">Card message: <em>“{message.trim()}”</em></p>
+					{/if}
+					<p class="mt-1 text-muted">Guest checkout — no account needed. We will offer to save your details after payment.</p>
+				</div>
 
 				<div class="mt-7 space-y-1 border-t border-line pt-4 text-sm">
 					<p class="flex justify-between"><span class="text-muted">Subtotal</span><span class="font-semibold">{money(cart.subtotal)}</span></p>

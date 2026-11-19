@@ -60,19 +60,28 @@
 				</div>
 
 				<ul class="flex-1 overflow-y-auto px-5 py-4" data-lenis-prevent>
-					{#each cart.lines as line (line.name)}
+					{#each cart.lines as line (line.key)}
 						<li class="flex items-center justify-between gap-3 border-b border-line/70 py-3">
 							<div class="min-w-0">
 								<p class="font-bold text-ink">{line.name}</p>
-								<p class="text-sm text-muted">{money(line.price)} each</p>
+								<p class="text-sm text-muted">{line.tier} · {money(line.price)} each</p>
+								{#if line.addons.length > 0}
+									<p class="text-xs text-muted">+ {line.addons.join(', ')}</p>
+								{/if}
+								{#if line.deliveryDate}
+									<p class="text-xs font-semibold text-leaf">Deliver on {line.deliveryDate}</p>
+								{/if}
+								{#if line.cardMessage}
+									<p class="truncate text-xs text-muted italic">“{line.cardMessage}”</p>
+								{/if}
 							</div>
 							<div class="flex shrink-0 items-center gap-2">
 								<div class="flex items-center rounded-full bg-blush">
 									<button
 										type="button"
-										onclick={() => setQty(line.name, line.qty - 1)}
+										onclick={() => setQty(line.key, line.qty - 1)}
 										aria-label={`One less ${line.name}`}
-										class="flex h-9 w-9 items-center justify-center rounded-full text-ink"
+										class="flex h-11 w-11 items-center justify-center rounded-full text-ink"
 									>
 										<Minus size={15} aria-hidden="true" />
 									</button>
@@ -81,9 +90,9 @@
 									>
 									<button
 										type="button"
-										onclick={() => setQty(line.name, line.qty + 1)}
+										onclick={() => setQty(line.key, line.qty + 1)}
 										aria-label={`One more ${line.name}`}
-										class="flex h-9 w-9 items-center justify-center rounded-full text-ink"
+										class="flex h-11 w-11 items-center justify-center rounded-full text-ink"
 									>
 										<Plus size={15} aria-hidden="true" />
 									</button>
@@ -91,9 +100,9 @@
 								<p class="w-16 text-right text-sm font-black text-ink">{money(line.price * line.qty)}</p>
 								<button
 									type="button"
-									onclick={() => removeLine(line.name)}
+									onclick={() => removeLine(line.key)}
 									aria-label={`Remove ${line.name}`}
-									class="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:text-ink"
+									class="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:text-ink"
 								>
 									<Trash2 size={16} aria-hidden="true" />
 								</button>

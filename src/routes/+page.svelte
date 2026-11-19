@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { ArrowRight, Heart, Leaf, Truck } from '@lucide/svelte';
+	import { ArrowRight, BellRing, CalendarHeart, Gift, Heart, Leaf, Search, Truck } from '@lucide/svelte';
 	import Picture from '#lib/components/Picture.svelte';
+	import PinChecker from '#lib/components/PinChecker.svelte';
 	import ProductCard from '#lib/components/ProductCard.svelte';
-	import Stars from '#lib/components/Stars.svelte';
-	import { bestsellers, occasions, testimonials } from '#lib/data/site.ts';
+	import TestimonialCarousel from '#lib/components/TestimonialCarousel.svelte';
+	import { bestsellers, hamperPicks, occasions, plantPicks } from '#lib/data/site.ts';
 
 	const heroTrust = [
 		{ icon: Truck, label: 'Fast & Reliable Delivery' },
@@ -85,6 +86,11 @@
 	</div>
 </div>
 
+<!-- PIN CHECKER — before the catalogue (fulfilment honesty first) -->
+<section class="mx-auto max-w-7xl px-4 pt-10 sm:px-6">
+	<PinChecker />
+</section>
+
 <!-- SHOP BY OCCASION -->
 <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
 	<div class="text-center reveal">
@@ -121,6 +127,28 @@
 	</div>
 </section>
 
+<!-- HOW IT WORKS -->
+<section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:pb-20">
+	<div class="grid gap-5 md:grid-cols-3">
+		{#each [
+			{ icon: Search, title: 'Pick your flowers', text: 'Browse by occasion, flower or price. Every bouquet shows its size, stems and price up front.' },
+			{ icon: CalendarHeart, title: 'Pick a date & message', text: 'Choose a delivery date — today, if you order by 2pm — and add a free hand-written card.' },
+			{ icon: Gift, title: 'We deliver today', text: 'Hand-tied by our florists and delivered across Mumbai, with a text when it leaves the shop.' }
+		] as step}
+			<article class="rounded-[2rem] bg-white p-6 ring-1 ring-line">
+				<span class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-soft text-rose-dark">
+					<step.icon size={23} aria-hidden="true" />
+				</span>
+				<h3 class="mt-3 font-display text-xl font-bold text-leaf">{step.title}</h3>
+				<p class="mt-1.5 text-sm leading-relaxed text-muted">{step.text}</p>
+			</article>
+		{/each}
+	</div>
+	<p class="mt-5 text-center text-sm">
+		<a href="/how-it-works" class="font-bold text-rose-dark underline-offset-4 hover:underline">First time here? See the full guide →</a>
+	</p>
+</section>
+
 <!-- BEST SELLERS -->
 <section class="bg-blush">
 	<div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_2fr] lg:py-20">
@@ -144,6 +172,26 @@
 				<ProductCard {product} />
 			{/each}
 		</div>
+	</div>
+</section>
+
+<!-- PLANTS & HAMPERS -->
+<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
+	<div class="flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<p class="text-xs font-bold tracking-[0.28em] text-rose-dark uppercase">More Than Bouquets</p>
+			<h2 class="mt-3 font-display text-4xl font-bold text-leaf sm:text-5xl">Plants &amp; Hampers</h2>
+			<p class="mt-2 max-w-md leading-relaxed text-muted">Gifts that keep growing — and combos that cover every base.</p>
+		</div>
+		<div class="flex gap-3">
+			<a href="/plants" class="inline-flex min-h-12 items-center rounded-full border border-line bg-white px-6 text-sm font-bold text-ink transition-colors duration-200 hover:border-rose">All plants →</a>
+			<a href="/hampers" class="inline-flex min-h-12 items-center rounded-full border border-line bg-white px-6 text-sm font-bold text-ink transition-colors duration-200 hover:border-rose">All hampers →</a>
+		</div>
+	</div>
+	<div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+		{#each [...plantPicks.slice(0, 2), ...hamperPicks.slice(0, 2)] as product (product.id)}
+			<ProductCard {product} />
+		{/each}
 	</div>
 </section>
 
@@ -188,23 +236,33 @@
 			<p class="text-xs font-bold tracking-[0.28em] text-rose-dark uppercase">Happy Customers</p>
 			<h2 class="mt-3 font-display text-4xl font-bold text-leaf sm:text-5xl">Loved, Delivered, Remembered</h2>
 		</div>
-		<div class="mt-10 grid gap-5 md:grid-cols-3">
-			{#each testimonials.slice(0, 3) as t}
-				<figure class="rounded-3xl bg-white p-6 ring-1 ring-line">
-					<Stars rating={t.rating} size={17} />
-					<blockquote class="mt-3 leading-relaxed text-ink">“{t.text}”</blockquote>
-					<figcaption class="mt-4">
-						<p class="font-bold text-ink">{t.name}</p>
-						<p class="text-sm text-muted">{t.occasion}</p>
-					</figcaption>
-				</figure>
-			{/each}
-		</div>
+		<TestimonialCarousel />
 		<p class="mt-8 text-center">
 			<a href="/reviews" class="font-bold text-rose-dark underline-offset-4 hover:underline">
 				Read all customer reviews →
 			</a>
 		</p>
+	</div>
+</section>
+
+<!-- WEDDINGS & CORPORATE + REMINDERS -->
+<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
+	<div class="grid gap-5 lg:grid-cols-3">
+		<a href="/weddings" class="group overflow-hidden rounded-[2rem] bg-leaf p-7 text-white transition-shadow duration-200 hover:shadow-xl">
+			<p class="font-script text-3xl text-rose-soft">Weddings &amp; Events</p>
+			<p class="mt-2 leading-relaxed text-white/80">Bridal bouquets, mandap florals and table centrepieces — designed with you, styled on the day.</p>
+			<p class="mt-4 text-sm font-bold text-white">Plan your wedding flowers →</p>
+		</a>
+		<a href="/corporate" class="group overflow-hidden rounded-[2rem] bg-white p-7 ring-1 ring-line transition-shadow duration-200 hover:shadow-lg">
+			<p class="font-script text-3xl text-rose">Corporate Flowers</p>
+			<p class="mt-2 leading-relaxed text-muted">Weekly reception flowers for offices, hotels and restaurants — one monthly invoice.</p>
+			<p class="mt-4 text-sm font-bold text-rose-dark">Request a quote →</p>
+		</a>
+		<a href="/reminders" class="group overflow-hidden rounded-[2rem] bg-blush p-7 ring-1 ring-line transition-shadow duration-200 hover:shadow-lg">
+			<p class="flex items-center gap-2 font-display text-2xl font-bold text-leaf"><BellRing size={22} class="text-rose" aria-hidden="true" /> Never miss a date</p>
+			<p class="mt-2 leading-relaxed text-muted">Birthdays, anniversaries, Mother’s Day — we remind you a week before, with a bouquet suggestion.</p>
+			<p class="mt-4 text-sm font-bold text-rose-dark">Set a reminder →</p>
+		</a>
 	</div>
 </section>
 

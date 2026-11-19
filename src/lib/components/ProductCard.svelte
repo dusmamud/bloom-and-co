@@ -4,10 +4,10 @@
 	import Stars from '#lib/components/Stars.svelte';
 	import { addProduct } from '#lib/cart.svelte.ts';
 	import { drawer } from '#lib/drawer.svelte.ts';
+	import { toggleWish, wishlist } from '#lib/wishlist.svelte.ts';
 	import { money, type Product } from '#lib/data/site.ts';
 
 	let { product }: { product: Product } = $props();
-	let wished = $state(false);
 	let added = $state(false);
 
 	function add() {
@@ -37,14 +37,14 @@
 		{/if}
 		<button
 			type="button"
-			onclick={() => (wished = !wished)}
-			aria-label={wished ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
-			aria-pressed={wished}
-			class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors duration-200 {wished
+			onclick={() => toggleWish(product.id)}
+			aria-label={wishlist.has(product.id) ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
+			aria-pressed={wishlist.has(product.id)}
+			class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors duration-200 {wishlist.has(product.id)
 				? 'text-rose'
 				: 'text-muted hover:text-rose'}"
 		>
-			<Heart size={19} fill={wished ? 'currentColor' : 'none'} aria-hidden="true" />
+			<Heart size={19} fill={wishlist.has(product.id) ? 'currentColor' : 'none'} aria-hidden="true" />
 		</button>
 	</div>
 	<div class="flex flex-1 flex-col p-4 sm:p-5">

@@ -11,6 +11,7 @@
 	import Lenis from 'lenis';
 	import gsap from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { onNavigate } from '$app/navigation';
 	import { Phone, ShoppingBag } from '@lucide/svelte';
 	import CartDrawer from '#lib/components/CartDrawer.svelte';
 	import Header from '#lib/components/Header.svelte';
@@ -21,6 +22,41 @@
 	import { site } from '#lib/data/site.ts';
 
 	let { children } = $props();
+
+	// Live same-day countdown (IST, 2pm cutoff). Client-side only — the
+	// server render shows the static promise, the effect swaps in the timer.
+	// After the cutoff it flips to "tomorrow" automatically; never a fake timer.
+	let countdown = $state('Order by 2pm for same-day delivery in Mumbai');
+	$effect(() => {
+		const tick = () => {
+			const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+			const cutoff = new Date(now);
+			cutoff.setHours(14, 0, 0, 0);
+			if (now >= cutoff) {
+				countdown = 'Same-day cutoff passed — order now for delivery tomorrow in Mumbai';
+				return;
+			}
+			const ms = cutoff.getTime() - now.getTime();
+			const h = Math.floor(ms / 3_600_000);
+			const m = Math.floor((ms % 3_600_000) / 60_000);
+			countdown = `Order in the next ${h}h ${String(m).padStart(2, '0')}m for delivery today in Mumbai`;
+		};
+		tick();
+		const id = setInterval(tick, 30_000);
+		return () => clearInterval(id);
+	});
+
+	// View Transitions between pages (reduced-motion gated, transform/opacity only).
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 
 	// Florist JSON-LD. No aggregateRating: self-published stars are not
 	// allowed in schema (Google, 2026). No FAQPage schema: Google ended
@@ -127,13 +163,19 @@
 <!-- Scroll progress (rose line, transform only) -->
 <div
 	id="scroll-progress"
-	class="fixed top-0 left-0 z-[55] h-[3px] w-full origin-left scale-x-0 bg-rose"
+	class="fixed top-9 left-0 z-[55] h-[3px] w-full origin-left scale-x-0 bg-rose"
 	aria-hidden="true"
 ></div>
 
 <Header />
 <main id="main">{@render children()}</main>
 <Footer />
+
+<!-- Live same-day countdown bar -->
+<div class="fixed inset-x-0 top-0 z-[58] flex min-h-9 items-center justify-center bg-leaf px-4 py-1.5 text-center text-xs font-bold text-white sm:text-sm" role="status">
+	{countdown}
+</div>
+<div class="h-9" aria-hidden="true"></div>
 
 <!-- Floating WhatsApp (desktop/tablet) -->
 <a

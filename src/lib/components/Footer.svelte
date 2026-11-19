@@ -43,8 +43,12 @@
 			<ul class="mt-4 space-y-2.5 text-white/80">
 				<li><a class="hover:text-white" href="/shop">All Flowers</a></li>
 				<li><a class="hover:text-white" href="/occasions">Shop by Occasion</a></li>
+				<li><a class="hover:text-white" href="/plants">Plants</a></li>
+				<li><a class="hover:text-white" href="/hampers">Hampers &amp; Combos</a></li>
 				<li><a class="hover:text-white" href="/occasions/birthday">Birthday</a></li>
 				<li><a class="hover:text-white" href="/occasions/love">Love &amp; Romance</a></li>
+				<li><a class="hover:text-white" href="/weddings">Weddings &amp; Events</a></li>
+				<li><a class="hover:text-white" href="/corporate">Corporate Flowers</a></li>
 				<li><a class="hover:text-white" href="/subscriptions">Subscriptions</a></li>
 				<li><a class="hover:text-white" href="/gift-cards">Gift Cards</a></li>
 			</ul>
@@ -53,10 +57,16 @@
 			<p class="font-display text-lg font-bold">Help</p>
 			<ul class="mt-4 space-y-2.5 text-white/80">
 				<li><a class="hover:text-white" href="/delivery">Delivery Information</a></li>
+				<li><a class="hover:text-white" href="/areas">Delivery Areas</a></li>
+				<li><a class="hover:text-white" href="/track-order">Track Your Order</a></li>
+				<li><a class="hover:text-white" href="/how-it-works">How It Works</a></li>
 				<li><a class="hover:text-white" href="/care">Flower Care Guide</a></li>
+				<li><a class="hover:text-white" href="/blog">Flower Journal</a></li>
+				<li><a class="hover:text-white" href="/reminders">Occasion Reminders</a></li>
 				<li><a class="hover:text-white" href="/faq">FAQ</a></li>
 				<li><a class="hover:text-white" href="/contact">Contact Us</a></li>
 				<li><a class="hover:text-white" href="/reviews">Reviews</a></li>
+				<li><a class="hover:text-white" href="/accessibility">Accessibility</a></li>
 				<li><a class="hover:text-white" href="/privacy">Privacy Policy</a></li>
 				<li><a class="hover:text-white" href="/terms">Terms of Service</a></li>
 			</ul>

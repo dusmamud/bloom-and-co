@@ -1,4 +1,4 @@
-import { occasions, products, site } from '#lib/data/site.ts';
+import { areas, blogPosts, occasions, products, site } from '#lib/data/site.ts';
 
 export const prerender = true;
 
@@ -6,6 +6,18 @@ const staticPages = [
 	{ path: '/', priority: '1.0', changefreq: 'weekly' },
 	{ path: '/shop', priority: '0.9', changefreq: 'weekly' },
 	{ path: '/occasions', priority: '0.9', changefreq: 'weekly' },
+	{ path: '/plants', priority: '0.8', changefreq: 'weekly' },
+	{ path: '/hampers', priority: '0.8', changefreq: 'weekly' },
+	{ path: '/weddings', priority: '0.8', changefreq: 'monthly' },
+	{ path: '/corporate', priority: '0.7', changefreq: 'monthly' },
+	{ path: '/sympathy', priority: '0.8', changefreq: 'monthly' },
+	{ path: '/blog', priority: '0.8', changefreq: 'weekly' },
+	{ path: '/areas', priority: '0.8', changefreq: 'monthly' },
+	{ path: '/track-order', priority: '0.7', changefreq: 'monthly' },
+	{ path: '/how-it-works', priority: '0.7', changefreq: 'monthly' },
+	{ path: '/reminders', priority: '0.6', changefreq: 'monthly' },
+	{ path: '/wishlist', priority: '0.5', changefreq: 'monthly' },
+	{ path: '/accessibility', priority: '0.4', changefreq: 'yearly' },
 	{ path: '/checkout', priority: '0.8', changefreq: 'monthly' },
 	{ path: '/subscriptions', priority: '0.8', changefreq: 'monthly' },
 	{ path: '/gift-cards', priority: '0.8', changefreq: 'monthly' },
@@ -31,8 +43,20 @@ const occasionPages = occasions.map((o) => ({
 	changefreq: 'monthly'
 }));
 
+const areaPages = areas.map((a) => ({
+	path: `/areas/${a.id}`,
+	priority: '0.7',
+	changefreq: 'monthly'
+}));
+
+const blogPages = blogPosts.map((b) => ({
+	path: `/blog/${b.slug}`,
+	priority: '0.7',
+	changefreq: 'monthly'
+}));
+
 export function GET() {
-	const pages = [...staticPages, ...productPages, ...occasionPages];
+	const pages = [...staticPages, ...productPages, ...occasionPages, ...areaPages, ...blogPages];
 	const urls = pages.map(
 		(p) =>
 			`  <url><loc>${site.url}${p.path}</loc><changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`

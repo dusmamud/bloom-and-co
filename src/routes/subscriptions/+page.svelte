@@ -5,6 +5,7 @@
 	import { money, plans } from '#lib/data/site.ts';
 
 	let chosen = $state('');
+	let manage = $state<'active' | 'paused' | 'skipped'>('active');
 </script>
 
 <PageHero
@@ -83,5 +84,56 @@
 				<p class="mt-1 text-sm leading-relaxed text-muted">Free delivery, first week of the month, with a care card.</p>
 			</li>
 		</ol>
+	</div>
+
+	<!-- Manage a subscription (mock) -->
+	<div class="mx-auto mt-6 max-w-3xl rounded-[2rem] bg-white p-6 ring-1 ring-line sm:p-8">
+		<h2 class="font-display text-2xl font-bold text-leaf">Already subscribed? Manage it here</h2>
+		<p class="mt-1 text-sm text-muted">Mock controls — nothing is saved or charged. Your next box is the Bloom plan, arriving 3 Dec 2026.</p>
+		<div class="mt-5 flex flex-wrap gap-2" role="group" aria-label="Manage subscription">
+			<button
+				type="button"
+				onclick={() => (manage = 'active')}
+				aria-pressed={manage === 'active'}
+				class="min-h-12 rounded-full px-6 text-sm font-bold transition-colors duration-200 {manage === 'active'
+					? 'bg-leaf text-white'
+					: 'border border-line bg-white text-ink'}"
+			>
+				Active
+			</button>
+			<button
+				type="button"
+				onclick={() => (manage = 'paused')}
+				aria-pressed={manage === 'paused'}
+				class="min-h-12 rounded-full px-6 text-sm font-bold transition-colors duration-200 {manage === 'paused'
+					? 'bg-leaf text-white'
+					: 'border border-line bg-white text-ink'}"
+			>
+				Pause for a month
+			</button>
+			<button
+				type="button"
+				onclick={() => (manage = 'skipped')}
+				aria-pressed={manage === 'skipped'}
+				class="min-h-12 rounded-full px-6 text-sm font-bold transition-colors duration-200 {manage === 'skipped'
+					? 'bg-leaf text-white'
+					: 'border border-line bg-white text-ink'}"
+			>
+				Skip next box
+			</button>
+		</div>
+		<p class="mt-4 text-sm leading-relaxed text-muted" role="status">
+			{#if manage === 'active'}
+				Your subscription is active — next box 3 Dec 2026, free delivery. You can pause or skip any time before the 25th.
+			{:else if manage === 'paused'}
+				Paused — no box (and no charge) next month. Resume any time; your plan and price stay the same.
+			{:else}
+				Next box skipped — we will send the following one on 3 Jan 2027. No charge for the skipped box.
+			{/if}
+		</p>
+		<p class="mt-3 text-sm text-muted">
+			Gift subscriptions (3 or 6 months) work the same way — the buyer and recipient get separate messages, and we prompt
+			before renewal. <a href="/gift-cards" class="font-bold text-rose-dark underline-offset-4 hover:underline">Gift cards →</a>
+		</p>
 	</div>
 </section>
